@@ -29,3 +29,16 @@ This Streamlit app simulates a simple college website with features like user re
 3. Set up a MySQL database named `college_website` with tables for users and contacts. Update the database connection details in the code.
 4. Run the Streamlit app.
 
+
+
+screenshots
+1. Home page
+![WhatsApp Image 2024-03-11 at 18 29 42_82bb95df](https://github.com/amankr27/college_website/assets/75829327/058663bd-d646-461b-8c4d-192635ecb8fb)
+2. Login
+![WhatsApp Image 2024-03-11 at 18 30 24_29e522b5](https://github.com/amankr27/college_website/assets/75829327/9d01f1d9-fa69-45d2-86b9-66ba536397b1)
+   Register
+![WhatsApp Image 2024-03-11 at 18 30 50_b090740b](https://github.com/amankr27/college_website/assets/75829327/43cc17b6-baf5-47c1-a70c-b709d435a89e)
+4. Contact 
+![WhatsApp Image 2024-03-11 at 18 33 20_28d27fee](https://github.com/amankr27/college_website/assets/75829327/9d2626b4-35c0-4670-a710-295e99b616a4)
+
+
