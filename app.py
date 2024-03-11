@@ -4,7 +4,7 @@ import re
 
 # Connect to MySQL
 db_connection = mysql.connector.connect(
-    host="localhost",
+    host="127.0.0.1",
     user="root",
     password="root",
     database="college_website"
@@ -31,6 +31,13 @@ cursor.execute('''
     )
 ''')
 db_connection.commit()
+
+# Session state to track user login status
+class SessionState:
+    def __init__(self):
+        self.logged_in = False
+
+session_state = SessionState()
 
 # Streamlit app
 
@@ -70,7 +77,6 @@ def main():
         st.subheader("Contact Us")
         contact()
 
-
 # login() function
 def login():
     username = st.text_input("Username")
@@ -80,9 +86,15 @@ def login():
         # Check login credentials against the database
         if is_valid_login(username, password):
             # Set a session variable or display a success message
+            session_state.logged_in = True
             st.success("Logged in as {}".format(username))
         else:
             st.error("Invalid username or password")
+
+        # Add a "Logout" button when logged in
+        if session_state.logged_in:
+            if st.button("Logout"):
+                logout()
 
     # Registration form
     st.subheader("Register")
@@ -127,8 +139,13 @@ def add_user(username, password):
         else:
             st.error(f"Error adding user to the database: {str(err)}")
 
-# Inside the contact() function
+# Logout function
+def logout():
+    # Clear the session state to indicate the user is logged out
+    session_state.logged_in = False
+    st.success("Logged out successfully")
 
+# Inside the contact() function
 def contact():
     name = st.text_input("Your Name")
     email = st.text_input("Your Email")
@@ -157,6 +174,7 @@ def insert_contact_data(name, email, message):
     except Exception as e:
         db_connection.rollback()
         st.error(f"Error submitting message: {str(e)}")
+
 
 
 if __name__ == '__main__':
