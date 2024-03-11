@@ -4,10 +4,10 @@ import re
 
 # Connect to MySQL
 db_connection = mysql.connector.connect(
-    host="127.0.0.1",
-    user="root",
-    password="root",
-    database="college_website"
+    host="sql6.freesqldatabase.com",
+    user="sql6690368",
+    password="Ba7pS2rs9e",
+    database="sql6690368"
 )
 cursor = db_connection.cursor()
 
