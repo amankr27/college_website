@@ -27,6 +27,9 @@ message TEXT
 ''')
 
 conn.commit()
+cursor.execute("SELECT 1 FROM users WHERE username=?", ("admin",))
+if not cursor.fetchone():
+    add_user("admin", "admin123", "admin")
 
 # -------------------- SESSION --------------------
 
