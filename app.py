@@ -49,21 +49,21 @@ def is_username_taken(username):
 return cursor.fetchone() is not None
 
 def add_user(username, password, role="user"):
-try:
-cursor.execute(
-"INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-(username, hash_password(password), role)
-)
-conn.commit()
-st.success("Registration successful!")
-except sqlite3.IntegrityError:
-st.error("Username already exists")
+    try:
+        cursor.execute(
+        "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+        (username, hash_password(password), role)
+        )
+        conn.commit()
+        st.success("Registration successful!")
+    except sqlite3.IntegrityError:
+        st.error("Username already exists")
 
 def login_user(username, password):
-cursor.execute(
-"SELECT username, role FROM users WHERE username=? AND password=?",
-(username, hash_password(password))
-)
+    cursor.execute(
+    "SELECT username, role FROM users WHERE username=? AND password=?",
+    (username, hash_password(password))
+    )
 return cursor.fetchone()
 
 def logout():
