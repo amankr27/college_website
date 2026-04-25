@@ -67,50 +67,50 @@ def login_user(username, password):
 return cursor.fetchone()
 
 def logout():
-st.session_state.logged_in = False
-st.session_state.username = ""
-st.session_state.role = "user"
-st.success("Logged out")
+    st.session_state.logged_in = False
+    st.session_state.username = ""
+    st.session_state.role = "user"
+    st.success("Logged out")
 
 def insert_contact(name, email, message):
-cursor.execute(
-"INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)",
-(name, email, message)
-)
-conn.commit()
-st.success("Message submitted")
+    cursor.execute(
+    "INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)",
+    (name, email, message)
+    )
+    conn.commit()
+    st.success("Message submitted")
 
 def valid_email(email):
-pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$'
+    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$'
 return re.match(pattern, email)
 
 # -------------------- ADMIN PANEL --------------------
 
 def admin_panel():
-st.subheader("Admin Dashboard")
-
-```
-st.write("### Users")
-users = cursor.execute("SELECT id, username, role FROM users").fetchall()
-st.table(users)
-
-st.write("### Contact Messages")
-contacts = cursor.execute("SELECT * FROM contacts").fetchall()
-st.table(contacts)
-```
+    st.subheader("Admin Dashboard")
+    
+    ```
+    st.write("### Users")
+    users = cursor.execute("SELECT id, username, role FROM users").fetchall()
+    st.table(users)
+    
+    st.write("### Contact Messages")
+    contacts = cursor.execute("SELECT * FROM contacts").fetchall()
+    st.table(contacts)
+    ```
 
 # -------------------- UI --------------------
 
 def main():
-st.title("College Website")
-
-```
-menu = ["Home", "Login", "Contact"]
-if st.session_state.role == "admin":
-    menu.append("Admin")
-
-choice = st.sidebar.selectbox("Menu", menu)
-
+    st.title("College Website")
+    
+    ```
+    menu = ["Home", "Login", "Contact"]
+    if st.session_state.role == "admin":
+        menu.append("Admin")
+    
+    choice = st.sidebar.selectbox("Menu", menu)
+    
 if choice == "Home":
     st.write("Welcome to College Website")
 
@@ -130,11 +130,11 @@ elif choice == "Admin":
 # -------------------- LOGIN PAGE --------------------
 
 def login_page():
-st.subheader("Login")
-
-```
-username = st.text_input("Username")
-password = st.text_input("Password", type="password")
+    st.subheader("Login")
+    
+    ```
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
 
 if st.button("Login"):
     user = login_user(username, password)
@@ -170,12 +170,12 @@ if st.button("Register"):
 # -------------------- CONTACT --------------------
 
 def contact_page():
-st.subheader("Contact")
-
-```
-name = st.text_input("Name")
-email = st.text_input("Email")
-message = st.text_area("Message")
+    st.subheader("Contact")
+    
+    ```
+    name = st.text_input("Name")
+    email = st.text_input("Email")
+    message = st.text_area("Message")
 
 if st.button("Submit"):
     if valid_email(email):
