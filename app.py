@@ -100,11 +100,14 @@ def admin_panel():
 # -------------------- LOGIN PAGE --------------------
 
 def login_page():
-    st.subheader("Login")
-    
-    
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
+st.subheader("Login / Register")
+
+tab1, tab2 = st.tabs(["Login", "Register"])
+
+# -------- LOGIN --------
+with tab1:
+    username = st.text_input("Username", key="login_user")
+    password = st.text_input("Password", type="password", key="login_pass")
 
     if st.button("Login"):
         user = login_user(username, password)
@@ -115,7 +118,7 @@ def login_page():
             st.success(f"Welcome {user[0]}")
         else:
             st.error("Invalid credentials")
-    
+
     if st.session_state.logged_in:
         st.write(f"Logged in as {st.session_state.username}")
         if st.button("Logout"):
