@@ -240,28 +240,48 @@ def contact_page():
 # -------------------- MAIN UI --------------------
 
 def main():
-    st.title("College Website")
-    
+    st.title("🎓 College Website")
+
+    # Menu
     menu = ["Home", "Login", "Contact"]
-    if st.session_state.role == "admin":
+
+    # Show Admin only if logged in as admin
+    if st.session_state.get("logged_in") and st.session_state.get("role") == "admin":
         menu.append("Admin")
-    
+
     choice = st.sidebar.selectbox("Menu", menu)
-    
+
+    # ---------------- HOME ----------------
     if choice == "Home":
-        st.write("Welcome to College Website")
-        st.image("image1.jpg", caption="Our College", use_column_width=True)
+        st.subheader("Welcome to College Website")
+
+        st.image(
+            "image1.jpg",  # or use your RAW GitHub link if needed
+            caption="Our College",
+            use_container_width=True
+        )
+
+        st.markdown("""
+        ### Explore:
+        - 📚 Courses
+        - 👨‍🏫 Faculty
+        - 🎉 Campus Life
+        """)
+
+    # ---------------- LOGIN ----------------
     elif choice == "Login":
         login_page()
-    
+
+    # ---------------- CONTACT ----------------
     elif choice == "Contact":
         contact_page()
-    
+
+    # ---------------- ADMIN ----------------
     elif choice == "Admin":
-        if st.session_state.role == "admin":
+        if st.session_state.get("logged_in") and st.session_state.get("role") == "admin":
             admin_panel()
         else:
-            st.error("Access denied")
+            st.error("🔒 Access denied. Admins only.")
     
 
 # -------------------- RUN --------------------
