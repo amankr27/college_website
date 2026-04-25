@@ -254,8 +254,7 @@ def main():
     # ---------------- HOME ----------------
     if choice == "Home":
         st.subheader("Welcome to College Website")
-
-         st.image("image1.jpg", caption="Our College", use_column_width=True)
+        st.image("image1.jpg", caption="Our College", use_column_width=True)
 
 
     # ---------------- LOGIN ----------------
