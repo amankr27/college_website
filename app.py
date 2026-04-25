@@ -46,7 +46,7 @@ def hash_password(password):
 
 def is_username_taken(username):
     cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-return cursor.fetchone() is not None
+    return cursor.fetchone() is not None
 
 def add_user(username, password, role="user"):
     try:
@@ -64,7 +64,7 @@ def login_user(username, password):
     "SELECT username, role FROM users WHERE username=? AND password=?",
     (username, hash_password(password))
     )
-return cursor.fetchone()
+    return cursor.fetchone()
 
 def logout():
     st.session_state.logged_in = False
@@ -82,7 +82,7 @@ def insert_contact(name, email, message):
 
 def valid_email(email):
     pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$'
-return re.match(pattern, email)
+    return re.match(pattern, email)
 
 # -------------------- ADMIN PANEL --------------------
 
