@@ -31,11 +31,11 @@ conn.commit()
 # -------------------- SESSION --------------------
 
 if "logged_in" not in st.session_state:
-st.session_state.logged_in = False
+    st.session_state.logged_in = False
 if "username" not in st.session_state:
-st.session_state.username = ""
+    st.session_state.username = ""
 if "role" not in st.session_state:
-st.session_state.role = "user"
+    st.session_state.role = "user"
 
 # -------------------- SECURITY --------------------
 
