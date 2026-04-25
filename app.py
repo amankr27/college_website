@@ -199,7 +199,7 @@ def login_page():
                 st.session_state.username = user[0]
                 st.session_state.role = user[1]
                 st.success(f"Welcome {user[0]}")
-                st.return()
+                st.rerun()
             else:
                 st.error("Invalid credentials")
 
@@ -207,7 +207,7 @@ def login_page():
             st.write(f"Logged in as {st.session_state.username}")
             if st.button("Logout"):
                 logout()
-                st.return()
+                st.rerun()
 
     # REGISTER
     with tab2:
