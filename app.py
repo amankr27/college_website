@@ -100,29 +100,44 @@ def admin_panel():
 # -------------------- LOGIN PAGE --------------------
 
 def login_page():
-st.subheader("Login / Register")
+    st.subheader("Login / Register")
 
-tab1, tab2 = st.tabs(["Login", "Register"])
+    tab1, tab2 = st.tabs(["Login", "Register"])
 
-# -------- LOGIN --------
-with tab1:
-    username = st.text_input("Username", key="login_user")
-    password = st.text_input("Password", type="password", key="login_pass")
+    # LOGIN
+    with tab1:
+        username = st.text_input("Username", key="login_user")
+        password = st.text_input("Password", type="password", key="login_pass")
 
-    if st.button("Login"):
-        user = login_user(username, password)
-        if user:
-            st.session_state.logged_in = True
-            st.session_state.username = user[0]
-            st.session_state.role = user[1]
-            st.success(f"Welcome {user[0]}")
-        else:
-            st.error("Invalid credentials")
+        if st.button("Login"):
+            user = login_user(username, password)
+            if user:
+                st.session_state.logged_in = True
+                st.session_state.username = user[0]
+                st.session_state.role = user[1]
+                st.success(f"Welcome {user[0]}")
+            else:
+                st.error("Invalid credentials")
 
-    if st.session_state.logged_in:
-        st.write(f"Logged in as {st.session_state.username}")
-        if st.button("Logout"):
-            logout()
+        if st.session_state.logged_in:
+            st.write(f"Logged in as {st.session_state.username}")
+            if st.button("Logout"):
+                logout()
+
+    # REGISTER
+    with tab2:
+        new_user = st.text_input("New Username", key="reg_user")
+        new_pass = st.text_input("New Password", type="password", key="reg_pass")
+        confirm = st.text_input("Confirm Password", type="password", key="reg_confirm")
+
+        if st.button("Register"):
+            if new_pass == confirm:
+                if not is_username_taken(new_user):
+                    add_user(new_user, new_pass)
+                else:
+                    st.error("Username already exists")
+            else:
+                st.error("Passwords do not match")
 
 # Register
 st.subheader("Register")
