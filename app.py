@@ -170,6 +170,7 @@ def main():
     
     if choice == "Home":
         st.write("Welcome to College Website")
+        st.image("image1.jpg", caption="Our College", use_container_width=True)
     
     elif choice == "Login":
         login_page()
