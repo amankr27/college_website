@@ -1,181 +1,190 @@
 import streamlit as st
-import mysql.connector
+import sqlite3
 import re
+import hashlib
 
-# Connect to MySQL
-db_connection = mysql.connector.connect(
-    host="sql6.freesqldatabase.com",
-    user="sql6690368",
-    password="Ba7pS2rs9e",
-    database="sql6690368"
+# -------------------- DATABASE --------------------
+
+conn = sqlite3.connect("college.db", check_same_thread=False)
+cursor = conn.cursor()
+
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS users (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+username TEXT UNIQUE,
+password TEXT,
+role TEXT DEFAULT 'user'
 )
-cursor = db_connection.cursor()
-
-# Create a users table
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username TEXT,
-        password TEXT
-    )
 ''')
-db_connection.commit()
 
-# Create a contacts table
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS contacts (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255),
-        email VARCHAR(255),
-        message TEXT
-    )
+CREATE TABLE IF NOT EXISTS contacts (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+name TEXT,
+email TEXT,
+message TEXT
+)
 ''')
-db_connection.commit()
 
-# Session state to track user login status
-class SessionState:
-    def __init__(self):
-        self.logged_in = False
+conn.commit()
 
-session_state = SessionState()
+# -------------------- SESSION --------------------
 
-# Streamlit app
+if "logged_in" not in st.session_state:
+st.session_state.logged_in = False
+if "username" not in st.session_state:
+st.session_state.username = ""
+if "role" not in st.session_state:
+st.session_state.role = "user"
 
-# Function to check if the new username is already taken
-def is_username_taken(new_username):
-    cursor.execute("SELECT * FROM users WHERE username = %s", (new_username,))
-    result = cursor.fetchone()
-    return result is not None
+# -------------------- SECURITY --------------------
+
+def hash_password(password):
+return hashlib.sha256(password.encode()).hexdigest()
+
+# -------------------- FUNCTIONS --------------------
+
+def is_username_taken(username):
+cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+return cursor.fetchone() is not None
+
+def add_user(username, password, role="user"):
+try:
+cursor.execute(
+"INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+(username, hash_password(password), role)
+)
+conn.commit()
+st.success("Registration successful!")
+except sqlite3.IntegrityError:
+st.error("Username already exists")
+
+def login_user(username, password):
+cursor.execute(
+"SELECT username, role FROM users WHERE username=? AND password=?",
+(username, hash_password(password))
+)
+return cursor.fetchone()
+
+def logout():
+st.session_state.logged_in = False
+st.session_state.username = ""
+st.session_state.role = "user"
+st.success("Logged out")
+
+def insert_contact(name, email, message):
+cursor.execute(
+"INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)",
+(name, email, message)
+)
+conn.commit()
+st.success("Message submitted")
+
+def valid_email(email):
+pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$'
+return re.match(pattern, email)
+
+# -------------------- ADMIN PANEL --------------------
+
+def admin_panel():
+st.subheader("Admin Dashboard")
+
+```
+st.write("### Users")
+users = cursor.execute("SELECT id, username, role FROM users").fetchall()
+st.table(users)
+
+st.write("### Contact Messages")
+contacts = cursor.execute("SELECT * FROM contacts").fetchall()
+st.table(contacts)
+```
+
+# -------------------- UI --------------------
 
 def main():
-    st.title("College Website")
+st.title("College Website")
 
-    # Navigation
-    menu = ["Home", "Login", "Contact"]
-    choice = st.sidebar.selectbox("Menu", menu)
+```
+menu = ["Home", "Login", "Contact"]
+if st.session_state.role == "admin":
+    menu.append("Admin")
 
-    if choice == "Home":
-        st.subheader("Home")
-        st.write("""
-        Welcome to our College Website!
+choice = st.sidebar.selectbox("Menu", menu)
 
-        Here, you can find information about our courses, faculty, and events.
-        Explore the website to discover more about our academic programs and campus life.
-        """)
+if choice == "Home":
+    st.write("Welcome to College Website")
 
-        st.image("image1.jpg", caption="Our College", use_column_width=True)
+elif choice == "Login":
+    login_page()
 
-        st.write("""
-        If you have any questions or need assistance, feel free to contact us through the 'Contact' page.
-        """)
+elif choice == "Contact":
+    contact_page()
 
-    elif choice == "Login":
-        st.subheader("Login")
-        login()
+elif choice == "Admin":
+    if st.session_state.role == "admin":
+        admin_panel()
+    else:
+        st.error("Access denied")
+```
 
-    elif choice == "Contact":
-        st.subheader("Contact Us")
-        contact()
+# -------------------- LOGIN PAGE --------------------
 
-# login() function
-def login():
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
+def login_page():
+st.subheader("Login")
 
-    if st.button("Login"):
-        # Check login credentials against the database
-        if is_valid_login(username, password):
-            # Set a session variable or display a success message
-            session_state.logged_in = True
-            st.success("Logged in as {}".format(username))
+```
+username = st.text_input("Username")
+password = st.text_input("Password", type="password")
+
+if st.button("Login"):
+    user = login_user(username, password)
+    if user:
+        st.session_state.logged_in = True
+        st.session_state.username = user[0]
+        st.session_state.role = user[1]
+        st.success(f"Welcome {user[0]}")
+    else:
+        st.error("Invalid credentials")
+
+if st.session_state.logged_in:
+    st.write(f"Logged in as {st.session_state.username}")
+    if st.button("Logout"):
+        logout()
+
+# Register
+st.subheader("Register")
+new_user = st.text_input("New Username")
+new_pass = st.text_input("New Password", type="password")
+confirm = st.text_input("Confirm Password", type="password")
+
+if st.button("Register"):
+    if new_pass == confirm:
+        if not is_username_taken(new_user):
+            add_user(new_user, new_pass)
         else:
-            st.error("Invalid username or password")
+            st.error("Username exists")
+    else:
+        st.error("Passwords do not match")
+```
 
-        # Add a "Logout" button when logged in
-        if session_state.logged_in:
-            if st.button("Logout"):
-                logout()
+# -------------------- CONTACT --------------------
 
-    # Registration form
-    st.subheader("Register")
-    new_username = st.text_input("New Username")
-    new_password = st.text_input("New Password", type="password")
-    confirm_password = st.text_input("Confirm Password", type="password")
+def contact_page():
+st.subheader("Contact")
 
-    if st.button("Register"):
-        if new_password == confirm_password:
-            # Check if the new username is already taken
-            if not is_username_taken(new_username):
-                # Add user to the database
-                add_user(new_username, new_password)
-                st.success("Registration successful! You can now log in.")
-            else:
-                st.error("Username is already taken. Please choose a different one.")
-        else:
-            st.error("Passwords do not match. Please confirm your password.")
+```
+name = st.text_input("Name")
+email = st.text_input("Email")
+message = st.text_area("Message")
 
-def is_valid_login(username, password):
-    # Query the database to check if the provided credentials are valid
-    try:
-        cursor.execute('''
-            SELECT * FROM users WHERE username = %s AND password = %s
-        ''', (username, password))
-        result = cursor.fetchone()
-        return result is not None
-    except Exception as e:
-        st.error(f"Error checking login credentials: {str(e)}")
-        return False
+if st.button("Submit"):
+    if valid_email(email):
+        insert_contact(name, email, message)
+    else:
+        st.error("Invalid email")
+```
 
-# Function to add user to the database
-def add_user(username, password):
-    try:
-        cursor.execute('''
-            INSERT INTO users (username, password) VALUES (%s, %s)
-        ''', (username, password))
-        db_connection.commit()
-    except mysql.connector.Error as err:
-        if err.errno == 1062:
-            st.error("Error adding user to the database: Username is already taken.")
-        else:
-            st.error(f"Error adding user to the database: {str(err)}")
+# -------------------- RUN --------------------
 
-# Logout function
-def logout():
-    # Clear the session state to indicate the user is logged out
-    session_state.logged_in = False
-    st.success("Logged out successfully")
-
-# Inside the contact() function
-def contact():
-    name = st.text_input("Your Name")
-    email = st.text_input("Your Email")
-    message = st.text_area("Your Message")
-
-    if st.button("Submit"):
-        # Add contact form submission logic and database connection here
-        if is_valid_email(email):
-            insert_contact_data(name, email, message)
-            st.success("Message submitted successfully")
-        else:
-            st.error("Invalid email address. Please provide a valid email.")
-
-def is_valid_email(email):
-    # Email validation using a regular expression
-    email_pattern = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
-    return bool(re.match(email_pattern, email))
-
-def insert_contact_data(name, email, message):
-    # Add contact form submission logic and database connection here
-    try:
-        cursor.execute('''
-            INSERT INTO contacts (name, email, message) VALUES (%s, %s, %s)
-        ''', (name, email, message))
-        db_connection.commit()
-    except Exception as e:
-        db_connection.rollback()
-        st.error(f"Error submitting message: {str(e)}")
-
-
-
-if __name__ == '__main__':
-    main()
+if **name** == "**main**":
+main()
