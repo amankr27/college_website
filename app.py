@@ -31,82 +31,80 @@ conn.commit()
 # -------------------- SESSION --------------------
 
 if "logged_in" not in st.session_state:
-st.session_state.logged_in = False
+    st.session_state.logged_in = False
 if "username" not in st.session_state:
-st.session_state.username = ""
+    st.session_state.username = ""
 if "role" not in st.session_state:
-st.session_state.role = "user"
+    st.session_state.role = "user"
 
 # -------------------- SECURITY --------------------
 
 def hash_password(password):
-return hashlib.sha256(password.encode()).hexdigest()
+    return hashlib.sha256(password.encode()).hexdigest()
 
 # -------------------- FUNCTIONS --------------------
 
 def is_username_taken(username):
-cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-return cursor.fetchone() is not None
+    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+    return cursor.fetchone() is not None
 
 def add_user(username, password, role="user"):
-try:
-cursor.execute(
-"INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-(username, hash_password(password), role)
-)
-conn.commit()
-st.success("Registration successful!")
-except sqlite3.IntegrityError:
-st.error("Username already exists")
+    try:
+        cursor.execute(
+        "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+        (username, hash_password(password), role)
+        )
+        conn.commit()
+        st.success("Registration successful!")
+    except sqlite3.IntegrityError:
+        st.error("Username already exists")
 
 def login_user(username, password):
-cursor.execute(
-"SELECT username, role FROM users WHERE username=? AND password=?",
-(username, hash_password(password))
-)
-return cursor.fetchone()
+    cursor.execute(
+    "SELECT username, role FROM users WHERE username=? AND password=?",
+    (username, hash_password(password))
+    )
+    return cursor.fetchone()
 
 def logout():
-st.session_state.logged_in = False
-st.session_state.username = ""
-st.session_state.role = "user"
-st.success("Logged out")
+    st.session_state.logged_in = False
+    st.session_state.username = ""
+    st.session_state.role = "user"
+    st.success("Logged out")
 
 def insert_contact(name, email, message):
-cursor.execute(
-"INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)",
-(name, email, message)
-)
-conn.commit()
-st.success("Message submitted")
+    cursor.execute(
+    "INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)",
+    (name, email, message)
+    )
+    conn.commit()
+    st.success("Message submitted")
 
 def valid_email(email):
-pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$'
-return re.match(pattern, email)
+    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$'
+    return re.match(pattern, email)
 
 # -------------------- ADMIN PANEL --------------------
 
 def admin_panel():
-st.subheader("Admin Dashboard")
-
-```
-st.write("### Users")
-users = cursor.execute("SELECT id, username, role FROM users").fetchall()
-st.table(users)
-
-st.write("### Contact Messages")
-contacts = cursor.execute("SELECT * FROM contacts").fetchall()
-st.table(contacts)
-```
+    st.subheader("Admin Dashboard")
+    
+    st.write("### Users")
+    users = cursor.execute("SELECT id, username, role FROM users").fetchall()
+    st.table(users)
+    
+    st.write("### Contact Messages")
+    contacts = cursor.execute("SELECT * FROM contacts").fetchall()
+    st.table(contacts)
 
 # -------------------- LOGIN PAGE --------------------
 
 def login_page():
-st.subheader("Login")
-
-```
-username = st.text_input("Username")
-password = st.text_input("Password", type="password")
+    st.subheader("Login")
+    
+    
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
 
 if st.button("Login"):
     user = login_user(username, password)
@@ -137,54 +135,53 @@ if st.button("Register"):
             st.error("Username exists")
     else:
         st.error("Passwords do not match")
-```
+
 
 # -------------------- CONTACT --------------------
 
 def contact_page():
-st.subheader("Contact")
+    st.subheader("Contact")
+    
+    
+    name = st.text_input("Name")
+    email = st.text_input("Email")
+    message = st.text_area("Message")
 
-```
-name = st.text_input("Name")
-email = st.text_input("Email")
-message = st.text_area("Message")
+    if st.button("Submit"):
+        if valid_email(email):
+            insert_contact(name, email, message)
+        else:
+            st.error("Invalid email")
 
-if st.button("Submit"):
-    if valid_email(email):
-        insert_contact(name, email, message)
-    else:
-        st.error("Invalid email")
-```
 
 # -------------------- MAIN UI --------------------
 
 def main():
-st.title("College Website")
-
-```
-menu = ["Home", "Login", "Contact"]
-if st.session_state.role == "admin":
-    menu.append("Admin")
-
-choice = st.sidebar.selectbox("Menu", menu)
-
-if choice == "Home":
-    st.write("Welcome to College Website")
-
-elif choice == "Login":
-    login_page()
-
-elif choice == "Contact":
-    contact_page()
-
-elif choice == "Admin":
+    st.title("College Website")
+    
+    menu = ["Home", "Login", "Contact"]
     if st.session_state.role == "admin":
-        admin_panel()
-    else:
-        st.error("Access denied")
-```
+        menu.append("Admin")
+    
+    choice = st.sidebar.selectbox("Menu", menu)
+    
+    if choice == "Home":
+        st.write("Welcome to College Website")
+    
+    elif choice == "Login":
+        login_page()
+    
+    elif choice == "Contact":
+        contact_page()
+    
+    elif choice == "Admin":
+        if st.session_state.role == "admin":
+            admin_panel()
+        else:
+            st.error("Access denied")
+    
 
 # -------------------- RUN --------------------
 
-if **name** == "**main**":
-main()
+if __name__ == "__main__":
+    main()
