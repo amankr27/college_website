@@ -106,20 +106,20 @@ def login_page():
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
 
-if st.button("Login"):
-    user = login_user(username, password)
-    if user:
-        st.session_state.logged_in = True
-        st.session_state.username = user[0]
-        st.session_state.role = user[1]
-        st.success(f"Welcome {user[0]}")
-    else:
-        st.error("Invalid credentials")
-
-if st.session_state.logged_in:
-    st.write(f"Logged in as {st.session_state.username}")
-    if st.button("Logout"):
-        logout()
+    if st.button("Login"):
+        user = login_user(username, password)
+        if user:
+            st.session_state.logged_in = True
+            st.session_state.username = user[0]
+            st.session_state.role = user[1]
+            st.success(f"Welcome {user[0]}")
+        else:
+            st.error("Invalid credentials")
+    
+    if st.session_state.logged_in:
+        st.write(f"Logged in as {st.session_state.username}")
+        if st.button("Logout"):
+            logout()
 
 # Register
 st.subheader("Register")
