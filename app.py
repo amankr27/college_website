@@ -89,7 +89,7 @@ return re.match(pattern, email)
 def admin_panel():
     st.subheader("Admin Dashboard")
     
-    ```
+    
     st.write("### Users")
     users = cursor.execute("SELECT id, username, role FROM users").fetchall()
     st.table(users)
@@ -97,14 +97,14 @@ def admin_panel():
     st.write("### Contact Messages")
     contacts = cursor.execute("SELECT * FROM contacts").fetchall()
     st.table(contacts)
-    ```
+    
 
 # -------------------- UI --------------------
 
 def main():
     st.title("College Website")
     
-    ```
+    
     menu = ["Home", "Login", "Contact"]
     if st.session_state.role == "admin":
         menu.append("Admin")
@@ -125,14 +125,13 @@ elif choice == "Admin":
         admin_panel()
     else:
         st.error("Access denied")
-```
 
 # -------------------- LOGIN PAGE --------------------
 
 def login_page():
     st.subheader("Login")
     
-    ```
+    
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
 
@@ -165,14 +164,14 @@ if st.button("Register"):
             st.error("Username exists")
     else:
         st.error("Passwords do not match")
-```
+
 
 # -------------------- CONTACT --------------------
 
 def contact_page():
     st.subheader("Contact")
     
-    ```
+    
     name = st.text_input("Name")
     email = st.text_input("Email")
     message = st.text_area("Message")
@@ -182,7 +181,7 @@ if st.button("Submit"):
         insert_contact(name, email, message)
     else:
         st.error("Invalid email")
-```
+
 
 # -------------------- RUN --------------------
 
