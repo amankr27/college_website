@@ -255,18 +255,8 @@ def main():
     if choice == "Home":
         st.subheader("Welcome to College Website")
 
-        st.image(
-            "image1.jpg",  # or use your RAW GitHub link if needed
-            caption="Our College",
-            use_container_width=True
-        )
+         st.image("image1.jpg", caption="Our College", use_column_width=True)
 
-        st.markdown("""
-        ### Explore:
-        - 📚 Courses
-        - 👨‍🏫 Faculty
-        - 🎉 Campus Life
-        """)
 
     # ---------------- LOGIN ----------------
     elif choice == "Login":
