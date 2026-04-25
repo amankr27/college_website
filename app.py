@@ -45,7 +45,7 @@ def hash_password(password):
 # -------------------- FUNCTIONS --------------------
 
 def is_username_taken(username):
-cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
 return cursor.fetchone() is not None
 
 def add_user(username, password, role="user"):
