@@ -87,16 +87,35 @@ def valid_email(email):
 # -------------------- ADMIN PANEL --------------------
 
 def admin_panel():
-    st.subheader("Admin Dashboard")
-    
-    st.write("### Users")
-    users = cursor.execute("SELECT id, username, role FROM users").fetchall()
-    st.table(users)
-    
-    st.write("### Contact Messages")
-    contacts = cursor.execute("SELECT * FROM contacts").fetchall()
-    st.table(contacts)
+    st.title("👨‍💼 Admin Dashboard")
 
+tab1, tab2 = st.tabs(["👥 Users", "📩 Messages"])
+
+# USERS
+with tab1:
+    st.subheader("Registered Members")
+
+    users = cursor.execute(
+        "SELECT id, username, role FROM users"
+    ).fetchall()
+
+    if users:
+        st.dataframe(users, use_container_width=True)
+    else:
+        st.info("No users found")
+
+# CONTACT MESSAGES
+with tab2:
+    st.subheader("Contact Messages")
+
+    contacts = cursor.execute(
+        "SELECT id, name, email, message FROM contacts"
+    ).fetchall()
+
+    if contacts:
+        st.dataframe(contacts, use_container_width=True)
+    else:
+        st.info("No messages found")
 # -------------------- LOGIN PAGE --------------------
 
 def login_page():
