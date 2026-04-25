@@ -139,21 +139,6 @@ def login_page():
             else:
                 st.error("Passwords do not match")
 
-# Register
-st.subheader("Register")
-new_user = st.text_input("New Username")
-new_pass = st.text_input("New Password", type="password")
-confirm = st.text_input("Confirm Password", type="password")
-
-if st.button("Register"):
-    if new_pass == confirm:
-        if not is_username_taken(new_user):
-            add_user(new_user, new_pass)
-        else:
-            st.error("Username exists")
-    else:
-        st.error("Passwords do not match")
-
 
 # -------------------- CONTACT --------------------
 
