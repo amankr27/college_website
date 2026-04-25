@@ -40,7 +40,7 @@ if "role" not in st.session_state:
 # -------------------- SECURITY --------------------
 
 def hash_password(password):
-return hashlib.sha256(password.encode()).hexdigest()
+    return hashlib.sha256(password.encode()).hexdigest()
 
 # -------------------- FUNCTIONS --------------------
 
