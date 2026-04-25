@@ -89,33 +89,94 @@ def valid_email(email):
 def admin_panel():
     st.title("👨‍💼 Admin Dashboard")
 
-tab1, tab2 = st.tabs(["👥 Users", "📩 Messages"])
+    tab1, tab2, tab3 = st.tabs(["👥 Users", "📩 Messages", "📊 Overview"])
 
-# USERS
-with tab1:
-    st.subheader("Registered Members")
+    # ---------------- USERS MANAGEMENT ----------------
+    with tab1:
+        st.subheader("Manage Users")
 
-    users = cursor.execute(
-        "SELECT id, username, role FROM users"
-    ).fetchall()
+        users = cursor.execute(
+            "SELECT id, username, role FROM users"
+        ).fetchall()
 
-    if users:
-        st.dataframe(users, use_container_width=True)
-    else:
-        st.info("No users found")
+        if users:
+            for user in users:
+                col1, col2, col3, col4 = st.columns([2,2,2,2])
 
-# CONTACT MESSAGES
-with tab2:
-    st.subheader("Contact Messages")
+                with col1:
+                    st.write(user[0])  # ID
+                with col2:
+                    st.write(user[1])  # Username
+                with col3:
+                    st.write(user[2])  # Role
 
-    contacts = cursor.execute(
-        "SELECT id, name, email, message FROM contacts"
-    ).fetchall()
+                # Delete User
+                with col4:
+                    if st.button("❌ Delete", key=f"del_{user[0]}"):
+                        cursor.execute("DELETE FROM users WHERE id=?", (user[0],))
+                        conn.commit()
+                        st.success(f"User {user[1]} deleted")
+                        st.rerun()
 
-    if contacts:
-        st.dataframe(contacts, use_container_width=True)
-    else:
-        st.info("No messages found")
+            st.divider()
+
+            # Change Role
+            st.subheader("Change User Role")
+            usernames = [u[1] for u in users]
+
+            selected_user = st.selectbox("Select User", usernames)
+            new_role = st.selectbox("Select Role", ["user", "admin"])
+
+            if st.button("Update Role"):
+                cursor.execute(
+                    "UPDATE users SET role=? WHERE username=?",
+                    (new_role, selected_user)
+                )
+                conn.commit()
+                st.success("Role updated")
+                st.rerun()
+        else:
+            st.info("No users found")
+
+    # ---------------- MESSAGES MANAGEMENT ----------------
+    with tab2:
+        st.subheader("Manage Messages")
+
+        contacts = cursor.execute(
+            "SELECT id, name, email, message FROM contacts"
+        ).fetchall()
+
+        if contacts:
+            for msg in contacts:
+                st.write(f"**{msg[1]}** ({msg[2]})")
+                st.write(msg[3])
+
+                if st.button("🗑 Delete Message", key=f"msg_{msg[0]}"):
+                    cursor.execute("DELETE FROM contacts WHERE id=?", (msg[0],))
+                    conn.commit()
+                    st.success("Message deleted")
+                    st.rerun()
+
+                st.divider()
+        else:
+            st.info("No messages found")
+
+    # ---------------- OVERVIEW / ANALYTICS ----------------
+    with tab3:
+        st.subheader("Website Overview")
+
+        total_users = cursor.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        total_msgs = cursor.execute("SELECT COUNT(*) FROM contacts").fetchone()[0]
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.metric("Total Users", total_users)
+
+        with col2:
+            st.metric("Total Messages", total_msgs)
+
+        st.success("System running normally ✅")
 # -------------------- LOGIN PAGE --------------------
 
 def login_page():
